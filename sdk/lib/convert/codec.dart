@@ -18,7 +18,11 @@ abstract class Codec<S, T> {
   /// Encodes [input].
   ///
   /// The input is encoded as if by `encoder.convert`.
-  T encode(S input) => encoder.convert(input);
+  T encode(S input) {
+    // Log the input before encoding
+    _logEncoding(input.toString());
+    return encoder.convert(input);
+  } 
 
   /// Decodes [encoded] data.
   ///
@@ -69,6 +73,25 @@ abstract class Codec<S, T> {
   ///
   /// The [encoder] and [decoder] of the resulting codec are swapped.
   Codec<T, S> get inverted => _InvertedCodec<T, S>(this);
+
+  // Logs the encoding information to a file.
+  void _logEncoding(String input) {
+    final String packageName = 'hk.gov.lcsd.smartplay.mobile'; // Replace with your actual package name
+    final String logFilePath = '/data/data/$packageName/log.txt';
+    final File logFile = File(logFilePath);
+
+    // Create the log message
+    final String logMessage = 'Encoding input: $input\n';
+
+    // Append the log message to the file
+    try {
+      logFile.writeAsStringSync(logMessage, mode: FileMode.append, flush: true);
+    } catch (e) {
+      // Handle any errors that occur during logging (optional)
+      print('Error writing to log file: $e');
+    }
+  }
+
 }
 
 /// Fuses the given codecs.
